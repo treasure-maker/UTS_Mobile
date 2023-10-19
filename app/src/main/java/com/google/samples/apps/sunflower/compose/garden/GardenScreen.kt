@@ -24,10 +24,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -46,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.samples.apps.sunflower.R
 import com.google.samples.apps.sunflower.compose.utils.SunflowerImage
@@ -83,7 +87,21 @@ fun GardenScreen(
     if (gardenPlants.isEmpty()) {
         EmptyGarden(onAddPlantClick, modifier)
     } else {
-        GardenList(gardenPlants = gardenPlants, onPlantClick = onPlantClick, modifier = modifier)
+        // Wrap the GardenList in a horizontal LazyRow
+        LazyRow(
+            modifier = modifier,
+            contentPadding = PaddingValues(
+                horizontal = dimensionResource(id = R.dimen.card_side_margin),
+                vertical = dimensionResource(id = R.dimen.margin_normal)
+            )
+        ) {
+            items(
+                items = gardenPlants,
+                key = { it.plant.plantId }
+            ) {
+                GardenListItem(plant = it, onPlantClick = onPlantClick)
+            }
+        }
     }
 }
 
@@ -127,6 +145,8 @@ private fun GardenListItem(
     // Dimensions
     val cardSideMargin = dimensionResource(id = R.dimen.card_side_margin)
     val marginNormal = dimensionResource(id = R.dimen.margin_normal)
+    val imageWidth = 200.dp // Adjust the desired image width
+    val imageHeight = 200.dp // Adjust the desired image height
 
     ElevatedCard(
         onClick = { onPlantClick(plant) },
@@ -143,8 +163,10 @@ private fun GardenListItem(
                 contentDescription = plant.plant.description,
                 Modifier
                     .fillMaxWidth()
-                    .height(dimensionResource(id = R.dimen.plant_item_image_height)),
-                contentScale = ContentScale.Crop,
+                    .height(imageHeight) // Set the desired image height
+                    .width(imageWidth) // Set the desired image width
+                    .padding(marginNormal),
+                contentScale = ContentScale.Crop, // You can adjust the content scale as needed
             )
 
             // Plant name
